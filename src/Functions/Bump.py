@@ -1,11 +1,12 @@
 import math
-from Functions.AbstractFunction import Function
+from queue import Queue
+from . import AbstractFunction
 
+class Bump(AbstractFunction.AbstractFunction):
+    def calculate(variables: Queue[float]) -> float:
+        x = variables.get()
+        y = variables.get()
 
-import AbstractFunction
-
-class Bump(AbstractFunction):
-    def calculate(x: float, y: float) -> float:
         z: float
         if((x * y) < 0.75):
             z = None
@@ -17,4 +18,3 @@ class Bump(AbstractFunction):
             temp2 = math.sqrt(pow(x, 2) + 2 * pow(y, 2))
             z = -abs( (temp0 - temp1) / temp2)
             return z
-

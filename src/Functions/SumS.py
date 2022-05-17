@@ -1,9 +1,6 @@
-from Functions.AbstractFunction import Function
+from . import AbstractFunction
 
-
-import AbstractFunction
-
-class SumS(AbstractFunction):
+class SumS(AbstractFunction.AbstractFunction):
     def calculate(x: float) -> float:
         n: int = 2
         s: float = 0
