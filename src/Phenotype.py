@@ -3,24 +3,25 @@ from random import Random
 
 
 class Phenotype:
-    def __init__(self, random: Random, length: int) -> None:
+    def __init__(self, random: Random, length: int, mutationProbability: float) -> None:
         self.random = random
         self.genotype = self.generateRandomGenotype(length)
+        self.mutationProbability = mutationProbability
 
 
-    def generateRandomGenotype(self, length: int) -> List[int]:
-        genotype = []
+    def generateRandomGenotype(self, length: int):
+        initialGenotype = [int]
 
         for i in range(0,length):
-            genotype.append(self.random.randint(0, 1))
+            initialGenotype.append(self.random.randint(0, 1))
 
-        return genotype
+        return initialGenotype
 
 
-    def mutate(self, probability: float):
+    def mutate(self):
         for allele, value in self.genotype:
             num = self.random.random()
-            if num < probability:
+            if num < self.mutationProbability:
                 self.flip(allele, value)
 
 
@@ -30,19 +31,19 @@ class Phenotype:
 
     @property
     def genotype(self):
-        return self.genotype
+        return self._genotype
 
 
     @genotype.setter
-    def genotype(self, genotype):
-        self.genotype = genotype
+    def genotype(self, g):
+        self._genotype = g
 
 
     @property
     def fitness(self):
-        return self.fitness
+        return self._fitness
 
 
     @fitness.setter
-    def fitness(self, fitness: float):
-        self.fitness = fitness
+    def fitness(self, f: float):
+        self._fitness = f
