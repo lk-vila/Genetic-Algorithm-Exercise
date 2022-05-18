@@ -1,14 +1,23 @@
-from queue import Queue
+import math
+from typing import List
 from . import AbstractFunction
 
 class Gold(AbstractFunction.AbstractFunction):
-    def calculate(variables: Queue[float]) -> float:
-        x = variables.get()
-        y = variables.get()
+    def calculate(variables: List[float]) -> float:
+        x = variables.pop(0)
+        y = variables.pop(0)
 
         a: float = 1 + pow((x + y + 1), 2) * pow( (19 - 14 * x + 3 * pow(x, 2) - 14 * y + 6 * x * y + 3 * pow(y, 2) ) ,2)
         b: float = 30 + pow((2 * x - 3 * y), 2) * (18 - 32 * x + 12 * pow(x, 2) + 48 * y - 36 * x * y + 27 * pow(y, 2) )
         return a*b
 
+    def interpretGene(self, gene: List[int]) -> List[float]:
+        variables: List = []
+        x = super().convertBinList(gene[0:16]) * 0.0001 - 2
+        y = super().convertBinList(gene[16:32]) * 0.0001 - 2
+        variables.append(x)
+        variables.append(y)
+        return variables
+
     def getGeneLength(self):
-        return 10
+        return 32

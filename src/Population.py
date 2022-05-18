@@ -15,27 +15,27 @@ class Population:
         for phenotype in self.phenotypes:
             phenotype.mutate()
 
-    def roulette(phenotypes, random: Random) -> Phenotype:
-        populationTemp = phenotypes.sort(key=lambda phenotype: phenotype.fitness, reverse=True)
+    def roulette(self) -> Phenotype:
+        populationTemp = self.phenotypes.sort(key=lambda phenotype: phenotype.fitness, reverse=True)
         accumulatedFitness = []
         accumulatedFitness[0] = populationTemp[0].fitness
         for i in range(1, len(populationTemp)):
             accumulatedFitness[i] = accumulatedFitness[i-1] + populationTemp[i].fitness
-        randomNum = random.randrange(0, accumulatedFitness[len(accumulatedFitness)])
+        randomNum = self.random.randrange(0, accumulatedFitness[len(accumulatedFitness)])
         for j in range(0, len(accumulatedFitness)):
             if(randomNum < accumulatedFitness[j]):
-                return populationTemp[j]
+                self.phenotypes= populationTemp[j]
         raise Exception("Could not retrieve phenotype from roulette")
 
-    def tourney(phenotypes, random: Random, populationSize: int):
-        tempPopulation = phenotypes
+    def tourney(self, populationSize: int):
+        tempPopulation = self.phenotypes
         populationPicked = [Phenotype]
 
-        randomNum = random.randrange(0, len(tempPopulation))
+        randomNum = self.random.randrange(0, len(tempPopulation))
         populationPicked.insert(tempPopulation[randomNum])
         tempPopulation.pop(randomNum)
         tempPopulation.sort(key=lambda phenotype: phenotype.fitness, reverse=True)
-        for i in range(1, populationSize):
+        for i in range(1, len(self.phe)):
             populationPicked.insert(tempPopulation[0])
             tempPopulation.pop(0)
-        return populationPicked
+        self.phenotypes = populationPicked

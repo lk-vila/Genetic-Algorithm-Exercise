@@ -1,4 +1,5 @@
 import math
+from typing import List
 from . import AbstractFunction
 
 class Rastringin(AbstractFunction.AbstractFunction):
@@ -8,3 +9,14 @@ class Rastringin(AbstractFunction.AbstractFunction):
 
     def getGeneLength(self):
         return 13
+
+    def interpretGene(self, gene: List[int]) -> List[float]:
+        variables: List = []
+        x = super().convertBinList(gene[0:17]) * 0.0001 - 5
+        y = super().convertBinList(gene[17:34]) * 0.0001 - 5
+        variables.put(x)
+        variables.put(y)
+        return variables
+
+    def getGeneLength(self):
+        return 34
