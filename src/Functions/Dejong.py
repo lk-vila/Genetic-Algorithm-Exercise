@@ -3,12 +3,13 @@ from typing import List
 from . import AbstractFunction
 
 class Dejong(AbstractFunction.AbstractFunction):
-    def calculate(variables: List[float]) -> float:
+    def calculate(self, variables: List[float]) -> float:
         x = variables.pop(0)
         y = variables.pop(0)
 
         z: float = 100 * pow( (pow(x,2) - pow(y,2)), 2) + pow( (1 - pow(x, 2) ), 2)
-        return z
+        phenotype.fitness = z
+
 
     def interpretGene(self, gene: List[int]) -> List[float]:
         variables: List = []
@@ -17,6 +18,7 @@ class Dejong(AbstractFunction.AbstractFunction):
         variables.append(x)
         variables.append(y)
         return variables
+
 
     def getGeneLength(self):
         return 32

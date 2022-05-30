@@ -1,11 +1,13 @@
 from typing import List
 
+from Phenotype import Phenotype
+
 
 class AbstractFunction:
     def __init__(self) -> None:
         pass
 
-    def calculate(variables: List[float]) -> float:
+    def calculate(variables: List[float], phenotype: Phenotype) -> float:
         pass
 
     def interpretGene(gene: List[int]) -> List[float]:

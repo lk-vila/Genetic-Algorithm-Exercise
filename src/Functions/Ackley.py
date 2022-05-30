@@ -1,9 +1,11 @@
 import math
 from typing import List
+
+from Phenotype import Phenotype
 from . import AbstractFunction
 
 class Ackley(AbstractFunction.AbstractFunction):
-    def calculate(self, variables: List[float]) -> float:
+    def calculate(self, variables: List[float], phenotype: Phenotype) -> None:
         x = variables.pop(0)
 
         n: int = 2
@@ -15,13 +17,15 @@ class Ackley(AbstractFunction.AbstractFunction):
             s2 = s2 + math.cos((c * x))
 
         z: float = -a * math.exp( -b * math.sqrt(1/n*s1)) - math.exp(1/n*s2) + a + math.exp(1)
-        return z
+        phenotype.fitness = z
+
 
     def interpretGene(self, gene: List[int]) -> List[float]:
         variables: List = []
         x = super().convertBinList(gene[0:20]) * 0.0001 - 40
         variables.append(x)
         return variables
+
 
     def getGeneLength(self):
         return 20

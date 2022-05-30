@@ -1,6 +1,6 @@
 import argparse
-from concurrent.futures import thread
-from queue import Queue
+from ast import List
+import threading
 from random import Random
 import sys
 from Functions.AbstractFunction import AbstractFunction
@@ -10,6 +10,7 @@ from Functions.Dejong import Dejong
 from Functions.Gold import Gold
 from Functions.Rastringin import Rastringin
 from Functions.SumS import SumS
+from Phenotype import Phenotype
 from Population import Population
 
 def main():
@@ -27,8 +28,8 @@ def main():
     else:
         seed = Random().randrange(sys.maxsize)
         random = Random(seed)
-        print(f"Seed: {seed}")
-
+        
+    print(f"Seed: {seed}")
 
     function: AbstractFunction = globals()[functionName]()
 
@@ -39,8 +40,9 @@ def main():
 
 def doIteration(function: AbstractFunction, population: Population):
     for i, phenotype in enumerate(population.phenotypes):
-        variables: Queue[float] = function.interpretGene(phenotype)
-        phenotype.fitness = thread.start_new_thread(function.calculate(), ())
+        variables: List[float] = function.interpretGene(phenotype)
+        thread = threading.Thread(target=function.calculate, args=(variables, phenotype))
+        thread.start()
 
 
 parser = argparse.ArgumentParser(description="Genetic algorithm optimization")
