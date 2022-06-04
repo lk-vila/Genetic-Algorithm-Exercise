@@ -1,19 +1,38 @@
 from random import Random
+from webbrowser import get
+from xmlrpc.client import boolean
 
 from Phenotype import Phenotype
 
+from utils.logger import Logger
 
+LOG_TAG = "Population"
+COLOR = "purple"
 class Population:
-    def __init__(self, random: Random, populationSize: int, geneLength: int, mutationProbability: float) -> None:
+
+
+    def __init__(self, random: Random, verbose: boolean, populationSize: int, geneLength: int, mutationProbability: float) -> None:
         self.random = random
+        self.logger = Logger(verbose, LOG_TAG, COLOR)
         self.phenotypes = [Phenotype]
+
 
         for i in range(0, populationSize):
             self.phenotypes.append(Phenotype(self.random, geneLength, mutationProbability))
 
     def mutate(self):
+        self.logger.log("Starting mutation proccess")
         for phenotype in self.phenotypes:
             phenotype.mutate()
+        self.logger.log("Done!")
+
+
+    def breed(self):
+        self.logger.log("Starting breeding proccess")
+
+        for x in iter(self.phenotypes):
+            breed
+
 
     def roulette(self) -> Phenotype:
         populationTemp = self.phenotypes.sort(key=lambda phenotype: phenotype.fitness, reverse=True)

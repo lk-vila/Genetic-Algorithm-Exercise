@@ -3,17 +3,26 @@ from ast import List
 import threading
 from random import Random
 import sys
-from Functions.AbstractFunction import AbstractFunction
-from Functions.Ackley import Ackley
-from Functions.Bump import Bump
-from Functions.Dejong import Dejong
-from Functions.Gold import Gold
-from Functions.Rastringin import Rastringin
-from Functions.SumS import SumS
+from utils.parser import getArgs
+from utils.logger import Logger
+from functions.AbstractFunction import AbstractFunction
+from functions.Ackley import Ackley
+from functions.Bump import Bump
+from functions.Dejong import Dejong
+from functions.Gold import Gold
+from functions.Rastringin import Rastringin
+from functions.SumS import SumS
 from Phenotype import Phenotype
 from Population import Population
 
+
+LOG_TAG = "Population"
+COLOR = "green"
+logger = None
+
 def main():
+    args = getArgs()
+
     checkpoint = args.checkpoint
     functionName: str = args.function
     numberOfGenerations: int = args.generations
@@ -22,18 +31,21 @@ def main():
     seed: int = args.seed
     verbose: bool = args.verbose
 
+    logger = Logger(verbose, LOG_TAG, COLOR)
+
     random : Random
     if seed:
         random = Random(seed)
     else:
         seed = Random().randrange(sys.maxsize)
         random = Random(seed)
-        
-    print(f"Seed: {seed}")
+
+    logger.log(f"Seed: {seed}")
+    print("aaa")
 
     function: AbstractFunction = globals()[functionName]()
 
-    population: Population = Population(random, populationSize, function.getGeneLength(), mutationProbability)
+    population: Population = Population(random, verbose, populationSize, function.getGeneLength(), mutationProbability)
 
     for i in range(1, numberOfGenerations+1):
         doIteration(function, population)
@@ -43,16 +55,5 @@ def doIteration(function: AbstractFunction, population: Population):
         variables: List[float] = function.interpretGene(phenotype)
         thread = threading.Thread(target=function.calculate, args=(variables, phenotype))
         thread.start()
-
-
-parser = argparse.ArgumentParser(description="Genetic algorithm optimization")
-parser.add_argument("-c", "--checkpoint", type=str, help="path to checkpoint file")
-parser.add_argument("-f", "--function", type=str, required=True, help="function to calculate fitness with")
-parser.add_argument("-g", "--generations", type=int, required=True, help="number of generations to run")
-parser.add_argument("-m", "--mutation-probability", type=float, required=True, help="probability that a given allele of a phenotype mutates")
-parser.add_argument("-p", "--population-size", type=int, required=True, help="population size at the end of each generation")
-parser.add_argument("-s", "--seed", type=int, help="seed for the pseudorandom generator to use")
-parser.add_argument("-v", "--verbose", help="turn on verbosity", default=False, action="store_true")
-args = parser.parse_args()
 
 main()
