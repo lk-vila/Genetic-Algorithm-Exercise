@@ -1,18 +1,32 @@
-import argparse
-from concurrent.futures import thread
-from queue import Queue
+from ast import List
+from time import sleep
+import matplotlib.pyplot as plt
+import threading
 from random import Random
 import sys
-from Functions.AbstractFunction import AbstractFunction
-from Functions.Ackley import Ackley
-from Functions.Bump import Bump
-from Functions.Dejong import Dejong
-from Functions.Gold import Gold
-from Functions.Rastringin import Rastringin
-from Functions.SumS import SumS
+from utils.parser import getArgs
+from utils.logger import Logger
+from functions.AbstractFunction import AbstractFunction
+from functions.Ackley import Ackley
+from functions.Bump import Bump
+from functions.Dejong import Dejong
+from functions.Gold import Gold
+from functions.Rastringin import Rastringin
+from functions.SumS import SumS
+from Phenotype import Phenotype
 from Population import Population
 
+
+LOG_TAG = "Main"
+COLOR = "green"
+
+xpoints = []
+fitnessMeanList = []
+fitnessBestList = []
+
 def main():
+    args = getArgs()
+
     checkpoint = args.checkpoint
     functionName: str = args.function
     numberOfGenerations: int = args.generations
@@ -21,36 +35,66 @@ def main():
     seed: int = args.seed
     verbose: bool = args.verbose
 
+    global logger
+    logger = Logger(verbose, LOG_TAG, COLOR)
+
     random : Random
     if seed:
         random = Random(seed)
     else:
         seed = Random().randrange(sys.maxsize)
         random = Random(seed)
-        print(f"Seed: {seed}")
 
+    logger.log(f"Seed: {seed}")
 
     function: AbstractFunction = globals()[functionName]()
 
-    population: Population = Population(random, populationSize, function.getGeneLength(), mutationProbability)
+    population: Population = Population(random, verbose, populationSize, function.getGeneLength(), mutationProbability)
 
     for i in range(1, numberOfGenerations+1):
+        logger.log(f"Starting iteration {i}")
+        xpoints.append(i)
         doIteration(function, population)
 
+    plt.plot(xpoints, fitnessBestList, label="Best Fitness")
+    plt.plot(xpoints, fitnessMeanList, label="Population Fitness")
+    plt.legend(loc="upper left")
+    plt.title(f"{functionName}")
+    plt.xlabel("Generation")
+    plt.ylabel("Fitness")
+    plt.show()
+
 def doIteration(function: AbstractFunction, population: Population):
+
+    population.crossover()
+    population.mutate()
+    population.addRandom(int(population.populationSize/2))
+
     for i, phenotype in enumerate(population.phenotypes):
-        variables: Queue[float] = function.interpretGene(phenotype)
-        phenotype.fitness = thread.start_new_thread(function.calculate(), ())
+        variables: List[float] = function.interpretGene(phenotype.genotype)
+        if len(variables) == 2:
+            logger.log(f"x: {variables[0]} y: {variables[1]} ")
+        else:
+            logger.log(f"x: {variables[0]}")
+        # thread = threading.Thread(target=function.calculate, args=(variables, phenotype))
+        # thread.start()
+        function.calculate(variables, phenotype)
+    
+    population.biClassSelection(0.9)
 
+    fitnessMean: float = 0
+    for phenotype in population.phenotypes:
+        fitnessMean += phenotype.fitness
 
-parser = argparse.ArgumentParser(description="Genetic algorithm optimization")
-parser.add_argument("-c", "--checkpoint", type=str, help="path to checkpoint file")
-parser.add_argument("-f", "--function", type=str, required=True, help="function to calculate fitness with")
-parser.add_argument("-g", "--generations", type=int, required=True, help="number of generations to run")
-parser.add_argument("-m", "--mutation-probability", type=float, required=True, help="probability that a given allele of a phenotype mutates")
-parser.add_argument("-p", "--population-size", type=int, required=True, help="population size at the end of each generation")
-parser.add_argument("-s", "--seed", type=int, help="seed for the pseudorandom generator to use")
-parser.add_argument("-v", "--verbose", help="turn on verbosity", default=False, action="store_true")
-args = parser.parse_args()
+    fitnessMean = fitnessMean/len(population.phenotypes)
+    fitnessMeanList.append(fitnessMean)
+
+    fitnessBest = population.phenotypes[0].fitness
+    fitnessBestList.append(fitnessBest)
+    
+    logger.log(f"Fitness Best: {'{:e}'.format(fitnessBest)}")
+    logger.log(f"Fitness Mean: {'{:e}'.format(fitnessMean)}")
+    logger.log(f"Final population size: {len(population.phenotypes)}")
+    
 
 main()

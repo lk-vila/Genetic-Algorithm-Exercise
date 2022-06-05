@@ -1,9 +1,11 @@
 import math
 from typing import List
+
+from Phenotype import Phenotype
 from . import AbstractFunction
 
 class Bump(AbstractFunction.AbstractFunction):
-    def calculate(variables: List[float]) -> float:
+    def calculate(self, variables: List[float], phenotype: Phenotype) -> None:
         x = variables.pop(0)
         y = variables.pop(0)
 
@@ -17,7 +19,9 @@ class Bump(AbstractFunction.AbstractFunction):
             temp1 = 2 * (pow(math.cos(x), 2)) * (pow(math.cos(y), 2))
             temp2 = math.sqrt(pow(x, 2) + 2 * pow(y, 2))
             z = -abs( (temp0 - temp1) / temp2)
-            return z
+
+        phenotype.fitness = 1/z
+
 
     def interpretGene(self, gene: List[int]) -> List[float]:
         variables: List = []
@@ -26,6 +30,7 @@ class Bump(AbstractFunction.AbstractFunction):
         variables.append(x)
         variables.append(y)
         return variables
+
 
     def getGeneLength(self):
         return 34
