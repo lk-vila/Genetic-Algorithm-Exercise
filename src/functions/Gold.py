@@ -15,19 +15,9 @@ class Gold(AbstractFunction.AbstractFunction):
 
 
     def interpretGene(self, gene: List[int]) -> List[float]:
-        variables: List = []
-        x = super().convertBinList(gene[0:16]) * 0.0001 - 2
-        y = super().convertBinList(gene[16:32]) * 0.0001 - 2
-        if x > 2:
-            x = 2
-        if y > 2:
-            y = 2
-
-        variables.append(x)
-        variables.append(y)
-
-        return variables
-
+        min = -2
+        max = 2
+        return super.binaryConversion(gene,min,max)
 
     def getGeneLength(self):
         return 32

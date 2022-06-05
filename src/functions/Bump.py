@@ -24,12 +24,9 @@ class Bump(AbstractFunction.AbstractFunction):
 
 
     def interpretGene(self, gene: List[int]) -> List[float]:
-        variables: List = []
-        x = super().convertBinList(gene[0:17]) * 0.0001
-        y = super().convertBinList(gene[17:34]) * 0.0001
-        variables.append(x)
-        variables.append(y)
-        return variables
+        min = 0
+        max = 10
+        return super.binaryConversion(gene,min,max)
 
 
     def getGeneLength(self):

@@ -20,12 +20,10 @@ class SumS(AbstractFunction.AbstractFunction):
 
 
     def interpretGene(self, gene: List[int]) -> List[float]:
-        variables: List = []
-        x = super().convertBinList(gene[0:18]) * 0.0001 - 10
-        y = super().convertBinList(gene[18:36]) * 0.0001 - 10
-        variables.append(x)
-        variables.append(y)
-        return variables
+        min = -10
+        max = 10
+        return super.binaryConversion(gene,min,max)
+
 
 
     def getGeneLength(self):

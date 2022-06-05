@@ -5,6 +5,7 @@ from Phenotype import Phenotype
 from . import AbstractFunction
 
 class Ackley(AbstractFunction.AbstractFunction):
+
     def calculate(self, variables: List[float], phenotype: Phenotype) -> None:
         x = variables.pop(0)
         y = variables.pop(0)
@@ -25,20 +26,9 @@ class Ackley(AbstractFunction.AbstractFunction):
 
 
     def interpretGene(self, gene: List[int]) -> List[float]:
-        variables: List = []
-        x = super().convertBinList(gene[0:20]) * 0.0001 - 40
-        if x > 40:
-            x = 40
-        if x < -40:
-            x = -40
-        y = super().convertBinList(gene[20:40]) * 0.0001 - 40
-        if y > 40:
-            y = 40
-        if y < -40:
-            y = -40
-        variables.append(x)
-        variables.append(y)
-        return variables
+        min = -40
+        max = 40
+        return super.binaryConversion(gene,min,max)
 
 
     def getGeneLength(self):
