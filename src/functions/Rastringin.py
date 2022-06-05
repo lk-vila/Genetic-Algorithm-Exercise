@@ -17,12 +17,9 @@ class Rastringin(AbstractFunction.AbstractFunction):
 
 
     def interpretGene(self, gene: List[int]) -> List[float]:
-        variables: List = []
-        x = super().convertBinList(gene[0:17]) * 0.0001 - 5
-        y = super().convertBinList(gene[17:34]) * 0.0001 - 5
-        variables.put(x)
-        variables.put(y)
-        return variables
+        min = -5
+        max = 5
+        return super.binaryConversion(gene,min,max)
 
 
     def getGeneLength(self):
