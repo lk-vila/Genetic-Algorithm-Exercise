@@ -9,7 +9,7 @@ class Rastringin(AbstractFunction.AbstractFunction):
         x: float = variables.pop(0)
         y: float = variables.pop(0)
         z: float = pow(x, 2) + math.pow(y,2) - 10 * math.cos( 2 * math.pi * x) - 10 * math.cos(2 * math.pi * y) + 10
-        phenotype.fitness = (z * -1)
+        phenotype.fitness = 1/(z * -1)
 
 
     def getGeneLength(self):

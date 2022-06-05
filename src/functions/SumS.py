@@ -13,7 +13,7 @@ class SumS(AbstractFunction.AbstractFunction):
         for j in range(1, n):
             y = y + j * pow(x, 2)
 
-        phenotype.fitness = y
+        phenotype.fitness = -y
 
 
     def interpretGene(self, gene: List[int]) -> List[float]:

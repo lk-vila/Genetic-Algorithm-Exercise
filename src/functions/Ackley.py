@@ -17,12 +17,14 @@ class Ackley(AbstractFunction.AbstractFunction):
             s2 = s2 + math.cos((c * x))
 
         z: float = -a * math.exp( -b * math.sqrt(1/n*s1)) - math.exp(1/n*s2) + a + math.exp(1)
-        phenotype.fitness = z
+        phenotype.fitness = -z
 
 
     def interpretGene(self, gene: List[int]) -> List[float]:
         variables: List = []
         x = super().convertBinList(gene[0:20]) * 0.0001 - 40
+        if x > 40:
+            x = 40
         variables.append(x)
         return variables
 

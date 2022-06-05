@@ -1,5 +1,6 @@
-import argparse
 from ast import List
+from time import sleep
+import matplotlib.pyplot as plt
 import threading
 from random import Random
 import sys
@@ -16,9 +17,12 @@ from Phenotype import Phenotype
 from Population import Population
 
 
-LOG_TAG = "Population"
+LOG_TAG = "Main"
 COLOR = "green"
-logger = None
+
+xpoints = []
+fitnessMeanList = []
+fitnessBestList = []
 
 def main():
     args = getArgs()
@@ -31,6 +35,7 @@ def main():
     seed: int = args.seed
     verbose: bool = args.verbose
 
+    global logger
     logger = Logger(verbose, LOG_TAG, COLOR)
 
     random : Random
@@ -41,19 +46,55 @@ def main():
         random = Random(seed)
 
     logger.log(f"Seed: {seed}")
-    print("aaa")
 
     function: AbstractFunction = globals()[functionName]()
 
     population: Population = Population(random, verbose, populationSize, function.getGeneLength(), mutationProbability)
 
     for i in range(1, numberOfGenerations+1):
+        logger.log(f"Starting iteration {i}")
+        xpoints.append(i)
         doIteration(function, population)
 
+    plt.plot(xpoints, fitnessBestList, label="Best Fitness")
+    plt.plot(xpoints, fitnessMeanList, label="Population Fitness")
+    plt.legend(loc="upper left")
+    plt.title(f"{functionName}")
+    plt.xlabel("Generation")
+    plt.ylabel("Fitness")
+    plt.show()
+
 def doIteration(function: AbstractFunction, population: Population):
+
+    population.crossover()
+    population.mutate()
+    population.addRandom(int(population.populationSize/2))
+
     for i, phenotype in enumerate(population.phenotypes):
-        variables: List[float] = function.interpretGene(phenotype)
-        thread = threading.Thread(target=function.calculate, args=(variables, phenotype))
-        thread.start()
+        variables: List[float] = function.interpretGene(phenotype.genotype)
+        if len(variables) == 2:
+            logger.log(f"x: {variables[0]} y: {variables[1]} ")
+        else:
+            logger.log(f"x: {variables[0]}")
+        # thread = threading.Thread(target=function.calculate, args=(variables, phenotype))
+        # thread.start()
+        function.calculate(variables, phenotype)
+    
+    population.biClassSelection(0.9)
+
+    fitnessMean: float = 0
+    for phenotype in population.phenotypes:
+        fitnessMean += phenotype.fitness
+
+    fitnessMean = fitnessMean/len(population.phenotypes)
+    fitnessMeanList.append(fitnessMean)
+
+    fitnessBest = population.phenotypes[0].fitness
+    fitnessBestList.append(fitnessBest)
+    
+    logger.log(f"Fitness Best: {'{:e}'.format(fitnessBest)}")
+    logger.log(f"Fitness Mean: {'{:e}'.format(fitnessMean)}")
+    logger.log(f"Final population size: {len(population.phenotypes)}")
+    
 
 main()

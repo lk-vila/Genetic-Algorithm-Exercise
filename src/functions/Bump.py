@@ -20,7 +20,7 @@ class Bump(AbstractFunction.AbstractFunction):
             temp2 = math.sqrt(pow(x, 2) + 2 * pow(y, 2))
             z = -abs( (temp0 - temp1) / temp2)
 
-        phenotype.fitness = z
+        phenotype.fitness = 1/z
 
 
     def interpretGene(self, gene: List[int]) -> List[float]:
