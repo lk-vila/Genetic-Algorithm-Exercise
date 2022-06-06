@@ -1,4 +1,5 @@
 from asyncio.log import logger
+from copy import deepcopy
 from random import Random
 from typing import List
 from webbrowser import get
@@ -33,8 +34,9 @@ class Population:
 
     def mutate(self):
         self.logger.log("Starting mutation proccess")
-        for phenotype in self.phenotypes:
-            phenotype.mutate()
+        for i, phenotype in enumerate(self.phenotypes):
+            if i>0:
+                phenotype.mutate()
         self.logger.log("Done!")
 
 
@@ -42,9 +44,11 @@ class Population:
         self.logger.log("Starting crossover proccess")
 
         children: List[Phenotype] = []
-        for i in range(0, int(self.populationSize/2)):
-            dad = self.random.choice(self.phenotypes)
-            mom = self.random.choice(self.phenotypes)
+        for i in range(0, int(self.populationSize*0.6)):
+            dad_index = self.random.randint(0,int(len(self.phenotypes)*0.1))
+            dad = self.phenotypes[dad_index]
+            mom_index = self.random.randint(int(len(self.phenotypes)*0.1), int(len(self.phenotypes)-1))
+            mom = self.phenotypes[mom_index]
             children.append(self.breed(dad, mom))
         self.logger.log("Done!")
         self.phenotypes += children
@@ -76,18 +80,30 @@ class Population:
 
 
     def tourney(self):
-        tempPopulation = self.phenotypes
-        populationPicked = [Phenotype]
+        diversityRate = 0.1
 
-        randomNum = self.random.randrange(0, len(tempPopulation))
-        populationPicked.insert(tempPopulation[randomNum])
-        tempPopulation.pop(randomNum)
-        tempPopulation.sort(key=lambda phenotype: phenotype.fitness, reverse=True)
-        for i in range(1, len(self.phenotypes)):
-            populationPicked.insert(tempPopulation[0])
-            tempPopulation.pop(0)
+        populationPicked: list[Phenotype] = []
+        
+        self.phenotypes.sort(key=lambda phenotype: phenotype.fitness, reverse=True)
+        populationPicked.append(self.phenotypes[0])
+
+        for i in range(1, self.populationSize):
+            selected1 = self.phenotypes[self.randint(0, len(self.phenotypes))]
+            selected2 = self.phenotypes[self.randint(0, len(self.phenotypes))]
+
+            randomNum = self.random.randrange(0, 1)
+
+            if(selected1.fitness > selected2.fitness):
+                if(randomNum < diversityRate):
+                    populationPicked.append(selected2)
+                else:
+                    populationPicked.append(selected1) 	
+            else:
+                if(randomNum < diversityRate):
+                    populationPicked.append(selected1)
+                else:
+                    populationPicked.append(selected2)
         self.phenotypes = populationPicked
-
 
     def biClassSelection(self, pPercentage: float):
         upperClass = []

@@ -22,12 +22,12 @@ class AbstractFunction:
     def convertBinList(self, list: List[int]) -> int:
         return int("".join(str(x) for x in list), 2)
 
-    def binaryConversion(gene: List[int], min: int, max: int) -> List[float]:
-        numLength = len(gene)/2
+    def binaryConversion(self, gene: List[int], min: int, max: int) -> List[float]:
+        numLength = int(len(gene)/2)
 
         variables: List = []
-        x = super().convertBinList(gene[0:numLength])
-        y = super().convertBinList(gene[numLength:numLength * 2])
+        x = self.convertBinList(gene[0:numLength])
+        y = self.convertBinList(gene[numLength:numLength * 2])
         
         x = min + (max - min) * x / (pow(2, numLength) - 1)
         y = min + (max - min) * y / (pow(2, numLength) - 1)

@@ -4,6 +4,8 @@ from typing import List
 from Phenotype import Phenotype
 from . import AbstractFunction
 
+zmax = 20
+
 class Ackley(AbstractFunction.AbstractFunction):
 
     def calculate(self, variables: List[float], phenotype: Phenotype) -> None:
@@ -22,14 +24,16 @@ class Ackley(AbstractFunction.AbstractFunction):
         s2 = s2 + math.cos((c * y))
 
         z: float = -a * math.exp( -b * math.sqrt(1/n*s1)) - math.exp(1/n*s2) + a + math.exp(1)
-        phenotype.fitness = -z
+
+        phenotype.fitness = -z + zmax
+        return z
 
 
     def interpretGene(self, gene: List[int]) -> List[float]:
         min = -40
         max = 40
-        return super.binaryConversion(gene,min,max)
+        return super().binaryConversion(gene,min,max)
 
 
     def getGeneLength(self):
-        return 40
+        return 100

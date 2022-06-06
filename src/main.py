@@ -32,6 +32,7 @@ def main():
     numberOfGenerations: int = args.generations
     mutationProbability: float = args.mutation_probability
     populationSize: int = args.population_size
+    resolution: int = args.resolution
     seed: int = args.seed
     verbose: bool = args.verbose
 
@@ -49,12 +50,19 @@ def main():
 
     function: AbstractFunction = globals()[functionName]()
 
-    population: Population = Population(random, verbose, populationSize, function.getGeneLength(), mutationProbability)
+    population: Population = Population(random, verbose, populationSize, resolution, mutationProbability)
 
     for i in range(1, numberOfGenerations+1):
         logger.log(f"Starting iteration {i}")
         xpoints.append(i)
+        if i > 1:
+            population.phenotypes.sort(key=lambda phenotype: phenotype.fitness, reverse=True)
         doIteration(function, population)
+
+    variables: List[float] = function.interpretGene(population.phenotypes[0].genotype)
+    logger.log(f"Best output: {function.calculate(variables, population.phenotypes[0])}")
+
+    logger.log(f"Seed: {seed}")
 
     plt.plot(xpoints, fitnessBestList, label="Best Fitness")
     plt.plot(xpoints, fitnessMeanList, label="Population Fitness")
@@ -66,21 +74,20 @@ def main():
 
 def doIteration(function: AbstractFunction, population: Population):
 
+    population.addRandom(int(population.populationSize*0.1))
     population.crossover()
     population.mutate()
-    population.addRandom(int(population.populationSize/2))
 
     for i, phenotype in enumerate(population.phenotypes):
         variables: List[float] = function.interpretGene(phenotype.genotype)
-        if len(variables) == 2:
-            logger.log(f"x: {variables[0]} y: {variables[1]} ")
-        else:
-            logger.log(f"x: {variables[0]}")
+        if i == 0:
+            logger.log(f"Best variables | x: {variables[0]} y: {variables[1]} ")
         # thread = threading.Thread(target=function.calculate, args=(variables, phenotype))
         # thread.start()
         function.calculate(variables, phenotype)
     
-    population.biClassSelection(0.9)
+    population.biClassSelection(1)
+    # population.tourney()
 
     fitnessMean: float = 0
     for phenotype in population.phenotypes:
@@ -91,7 +98,8 @@ def doIteration(function: AbstractFunction, population: Population):
 
     fitnessBest = population.phenotypes[0].fitness
     fitnessBestList.append(fitnessBest)
-    
+
+
     logger.log(f"Fitness Best: {'{:e}'.format(fitnessBest)}")
     logger.log(f"Fitness Mean: {'{:e}'.format(fitnessMean)}")
     logger.log(f"Final population size: {len(population.phenotypes)}")
